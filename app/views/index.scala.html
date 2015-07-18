@@ -1,0 +1,130 @@
+@(javascripts: Seq[String])
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>View Images</title>
+
+            <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap.min.css")">
+            <!-- Optional theme -->
+            <!--<link rel="stylesheet" href="@routes.Assets.versioned("lib/bootstrap/css/bootstrap-theme.min.css")">-->
+        <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/m.css")">
+        <script src="@routes.Assets.versioned("lib/jquery/jquery.min.js")" type="text/javascript"></script>
+            <!-- Latest compiled and minified JavaScript -->
+        <script src="@routes.Assets.versioned("lib/bootstrap/js/bootstrap.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("lib/angularjs/angular.min.js")" type="text/javascript"></script>
+        @for(script <- javascripts){
+            <script src="@routes.Assets.versioned(script)" type="text/javascript"></script>
+        }
+    </head>
+    <body data-ng-app="viewImageApp" data-ng-controller="imageController as ic">
+            <!-- Fixed navbar -->
+        <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Image Gallery</a>
+                </div>
+                <div class="collapse navbar-collapse navbar-ex1-collapse">
+                    <p class="navbar-text">{{ ic.currentCollection }}</p>
+                    <div class="col-sm-3 col-md-3 pull-right">
+                        <form class="navbar-form" role="search" data-ng-submit="ic.updateCollection()">
+                            <div class="input-group">
+                                <input type="text" class="form-control" data-ng-model="ic.collectionQuery" placeholder="Search" name="srch-term" id="srch-term">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div id="content">
+                <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+                    <li class="active"><a href="#ordered" data-toggle="tab">Pure Order</a></li>
+                    <li><a href="#random" data-toggle="tab">Random Show</a></li>
+                </ul>
+                <div id="my-tab-content" class="tab-content">
+                    <div class="tab-pane active" id="ordered" data-ng-show="ic.onShow">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="panel panel-default" data-spy="affix" data-offset-top="0" id="order-nav">
+                                    <nav class="text-center">
+                                        <ul class="pagination pagination-sm">
+
+                                            <li data-ng-repeat="i in ic.orderItemList.pageRange" data-ng-class="{active: ic.orderItemList.curPage == i}" data-ng-click="ic.orderItemList.curPage = i"><a href="#">{{ i }}</a></li>
+
+                                        </ul>
+                                    </nav>
+                                    <nav>
+                                        <ul class="pager">
+                                            <li class="previous">
+                                                <a href="#" data-ng-click="ic.orderItemList.dec()">
+                                                    <span aria-hidden="true">&larr;</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <select id="pageselect" data-ng-model="ic.orderItemList.curPage" data-ng-options="p as p for p in ic.orderItemList.totalPageRange"></select>
+                                                <label for="pageselect"></label>
+                                                /{{ ic.orderItemList.pages }}
+                                            </li>
+                                            <li class="next">
+                                                <a href="#" data-ng-click="ic.orderItemList.inc()">
+                                                    <span aria-hidden="true">&rarr;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                    <div class="list-group">
+                                        <button type="button" class="list-group-item" data-ng-repeat="item in ic.orderItemList.itemList" data-ng-click="ic.selectItem(item)">
+                                            <span class="badge"> {{ item.liked }} </span>
+                                            {{ item.title }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <ul class="list-group">
+                                    <li class="list-group-item" data-ng-repeat="img in ic.curItem.images">
+                                        <a data-ng-click="ic.showFullImage(img.url)">
+                                            <img data-ng-src="{{'http://localhost/' + ic.currentCollection + '/' + img.url}}" width="100%">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="random" data-ng-show="ic.onShow">
+                        <div class="row">
+                            <div class="col-md-11">
+                                <ul class="list-group">
+                                    <li class="list-group-item" data-ng-repeat="img in ic.curItem.images">
+                                        <a data-ng-click="ic.showFullImage(img.url)">
+                                            <img data-ng-src="{{'http://localhost/' + ic.currentCollection + '/' + img.url}}" width="100%">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn btn-default" type="submit" data-spy="affix" data-offset-top="0" data-ng-click="ic.randomSelect()">Random Shuffle</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade text-center" id="fullImageModal">
+            <img data-ng-src="{{ic.fullImageUrl}}">
+        </div><!-- /.modal -->
+    </body>
+
+</html>

@@ -1,0 +1,9 @@
+.idea/
+logs/
+.idea_modules/
+.classpath/
+.project/project/
+.project/target/
+target/
+.settings/
+RUNNING_PID/
