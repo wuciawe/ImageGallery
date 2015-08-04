@@ -50,7 +50,8 @@
         <div class="container">
             <div id="content">
                 <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-                    <li class="active"><a href="#ordered" data-toggle="tab">Pure Order</a></li>
+                    <li class="active"><a href="#ordered" data-ng-click="ic.setItemList(true)" data-toggle="tab">Pure Order</a></li>
+                    <li><a href="#favored" data-ng-click="ic.setItemList(false)" data-toggle="tab">Favored Order</a></li>
                     <li><a href="#random" data-toggle="tab">Random Show</a></li>
                 </ul>
                 <div id="my-tab-content" class="tab-content">
@@ -58,6 +59,55 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="panel panel-default" data-spy="affix" data-offset-top="0" id="order-nav">
+                                    <nav class="text-center">
+                                        <ul class="pagination pagination-sm">
+
+                                            <li data-ng-repeat="i in ic.orderItemList.pageRange" data-ng-class="{active: ic.orderItemList.curPage == i}" data-ng-click="ic.orderItemList.curPage = i"><a href="#">{{ i }}</a></li>
+
+                                        </ul>
+                                    </nav>
+                                    <nav>
+                                        <ul class="pager">
+                                            <li class="previous">
+                                                <a href="#" data-ng-click="ic.orderItemList.dec()">
+                                                    <span aria-hidden="true">&larr;</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <select id="pageselect" data-ng-model="ic.orderItemList.curPage" data-ng-options="p as p for p in ic.orderItemList.totalPageRange"></select>
+                                                <label for="pageselect"></label>
+                                                /{{ ic.orderItemList.pages }}
+                                            </li>
+                                            <li class="next">
+                                                <a href="#" data-ng-click="ic.orderItemList.inc()">
+                                                    <span aria-hidden="true">&rarr;</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                    <div class="list-group">
+                                        <button type="button" class="list-group-item" data-ng-repeat="item in ic.orderItemList.itemList" data-ng-click="ic.selectItem(item)">
+                                            <span class="badge"> {{ item.liked }} </span>
+                                            {{ item.title }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <ul class="list-group">
+                                    <li class="list-group-item" data-ng-repeat="img in ic.curItem.images">
+                                        <a data-ng-click="ic.showFullImage(img.url)">
+                                            <img data-ng-src="{{'http://localhost/' + ic.currentCollection + '/' + img.url}}" width="100%">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="favored" data-ng-show="ic.onShow">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="panel panel-default" data-spy="affix" data-offset-top="0" id="favor-nav">
                                     <nav class="text-center">
                                         <ul class="pagination pagination-sm">
 
@@ -125,6 +175,15 @@
         <div class="modal fade text-center" id="fullImageModal">
             <img data-ng-src="{{ic.fullImageUrl}}">
         </div><!-- /.modal -->
+
+        <div class="votes" data-ng-show="ic.curItem">
+            <button type="button" class="btn btn-danger navbar-btn" data-ng-click="ic.vote(ic.curItem, false)">
+                <span class="glyphicon glyphicon-chevron-down"></span>
+            </button>
+            <button type="button" class="btn btn-success navbar-btn" data-ng-click="ic.vote(ic.curItem, true)">
+                <span class="glyphicon glyphicon-chevron-up"></span>
+            </button>
+        </div>
     </body>
 
 </html>

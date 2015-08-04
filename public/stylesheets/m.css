@@ -5,3 +5,13 @@
 .pager {
     margin: 0;
 }
+
+.votes {
+    position: fixed;
+    left: 75%;
+    bottom: 20px;
+    z-index: 100;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: rgba(215, 219, 236, 0.3);
+}

@@ -33,7 +33,7 @@ routesGenerator := InjectedRoutesGenerator
 
 libraryDependencies ++= Seq(
   "javax.inject" % "javax.inject" % "1",
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.2.play24",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.5.play24",
   "org.webjars" % "bootstrap" % "3.3.5",
   "org.webjars" % "angularjs" % "1.4.2",
   "org.webjars" % "jquery" % "1.11.3",

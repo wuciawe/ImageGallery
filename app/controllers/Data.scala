@@ -1,6 +1,7 @@
 package controllers
 
 import javax.inject.Inject
+import models.Vote
 import play.modules.reactivemongo.json.collection.JsCursor._
 import play.modules.reactivemongo.json._
 import play.modules.reactivemongo.json.collection._
@@ -11,6 +12,11 @@ import play.modules.reactivemongo.{ReactiveMongoApi, ReactiveMongoComponents, Mo
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.ReadPreference
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.bson.{BSONObjectID, BSONDocument}
+import reactivemongo.api.commands.bson.BSONFindAndModifyCommand.{FindAndModify, Update}
+import play.modules.reactivemongo.json.BSONFormats
+import scala.concurrent.Future
 import scalaz._
 
 /**
@@ -31,6 +37,26 @@ class Data @Inject() (val reactiveMongoApi: ReactiveMongoApi) extends Controller
       .collect[List]()
       .map(_.foldLeft(JsArray())((acc, x) => acc ++ Json.arr(x)))
       .map(Ok(_))
+  }
+
+  def updateVote(id: String) = Action.async(BodyParsers.parse.json) { request =>
+    request.body.validate[Vote]
+    .fold(
+      errors => {
+        Future(BadRequest(Json.obj("status" -> "OK", "message" -> JsError.toJson(errors))))
+      },
+      vote => {
+        val command = FindAndModify(
+          BSONDocument("_id" -> BSONObjectID(id)),
+          Update(BSONDocument("$inc" -> BSONDocument("liked" -> {if(vote.up) 1 else -1})), false)
+        )
+        import reactivemongo.api.commands.bson.BSONFindAndModifyImplicits._
+        db.collection[BSONCollection](vote.collection).runCommand(command)
+          .map(_.value).map{res =>
+          Ok(BSONFormats.BSONDocumentFormat.writes(res.get).as[JsObject])
+        }
+      }
+    )
   }
 
 }
