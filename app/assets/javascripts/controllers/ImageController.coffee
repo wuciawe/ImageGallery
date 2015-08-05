@@ -4,6 +4,10 @@ class ImageController
     vm.orderNav = document.getElementById('order-nav')
     vm.favorNav = document.getElementById('favor-nav')
     vm.orderNavWidth = vm.orderNav.clientWidth
+    angular.element(vm.orderNav).css
+      width: vm.orderNavWidth
+    angular.element(vm.favorNav).css
+      width: vm.orderNavWidth
     vm.onShow = false
     @$log.debug "constructing ImageController"
     vm.itemList = undefined
@@ -44,18 +48,26 @@ class ImageController
     @curItem = @itemList[Math.floor(Math.random() * @itemList.length)]
   setItemList : (il) ->
     if @itemListo
+      @orderItemList.curPage = 1
       if il
         @itemList = @itemListo
-        angular.element(@orderNav).css
-          width: @orderNavWidth
+#        angular.element(@orderNav).css
+#          width: @orderNavWidth
         @updatePageView()
       else
-        @itemList = @itemListf
-        angular.element(@favorNav).css
-          width: @orderNavWidth
+        @itemList = @itemListf.sort (a, b) ->
+          b.liked - a.liked
+#        angular.element(@favorNav).css
+#          width: @orderNavWidth
         @updatePageView()
   vote: (item, up) ->
-    @DataService.vote(@currentCollection, item['_id']['$oid'], up)
+    @DataService.vote(@currentCollection, item['_id']['$oid'], up).then (data) ->
+      if up
+        item.liked += 1
+      else
+        item.liked -= 1
+    , (status) ->
+      vm.$log.error status
   updateCollection : ->
     @$log.info("update collection")
     $('#tabs a:first').tab('show')

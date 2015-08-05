@@ -13,6 +13,7 @@ class DataService
       deferred.reject data
     deferred.promise
   vote: (collection, id, up) ->
+    deferred = @$q.defer()
     @$http
       method: "PUT"
       url: "/jsondata/#{id}"
@@ -20,6 +21,8 @@ class DataService
         'collection': collection
         'up': up
     .success (data, status, headers, config) =>
-      console.log(data)
+      deferred.resolve data
     .error (data, status, headers, config) =>
-      console.log(status)
+      @$log.error "Failed to vote - status #{status}"
+      deferred.reject data
+    deferred.promise
